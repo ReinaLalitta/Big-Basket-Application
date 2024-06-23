@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import apiRouter from './router/apiRouter'; // Adjust the path based on your project structure
 
 const app: express.Application = express();
 
@@ -10,9 +11,9 @@ app.use(cors()); // CORS
 dotenv.config({ path: './.env' }); // for env variables
 app.use(express.json()); // json form data
 
-let hostName: string | undefined = process.env.HOST_NAME;
-let port: number | undefined = Number(process.env.PORT);
-let mongoDBURL: string | undefined = process.env.MONGODB_URL;
+const hostName: string | undefined = process.env.HOST_NAME;
+const port: number | undefined = Number(process.env.PORT);
+const mongoDBURL: string | undefined = process.env.MONGODB_URL;
 
 // MongoDb Connection
 if (mongoDBURL) {
@@ -30,8 +31,14 @@ app.get('/', (request: express.Request, response: express.Response) => {
     });
 });
 
+// router configuration
+app.use('/api/v1', apiRouter);
+
 if (port !== undefined && hostName !== undefined) {
     app.listen(port, hostName, () => {
         console.log(`Express Server is started at: http://${hostName}:${port}`);
     });
+} else {
+    console.error('Port or host name is not defined.');
+    process.exit(1);
 }
